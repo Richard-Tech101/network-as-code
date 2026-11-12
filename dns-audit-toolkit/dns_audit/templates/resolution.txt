@@ -1,0 +1,11 @@
+Subject: RESOLVED: DNS issue remediated on $count device(s)
+
+Hello,
+
+The DNS issue has been resolved. The following devices were affected and now use the trusted DNS servers again:
+
+$device_list
+
+No further action is required.
+
+Network Monitoring

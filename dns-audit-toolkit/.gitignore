@@ -1,0 +1,10 @@
+# local config and inventories may contain real hostnames
+config.toml
+inventory.csv
+results/
+.env
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

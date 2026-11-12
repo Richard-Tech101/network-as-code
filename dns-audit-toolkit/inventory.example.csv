@@ -1,0 +1,9 @@
+name,address,role,os,username,password_env
+router1,10.0.0.1,router,vyos,netops,DNSAUDIT_ROUTER_PASSWORD
+dns1,10.0.0.53,dns,linux,netops,DNSAUDIT_SSH_PASSWORD
+dns2,10.0.1.53,dns,linux,netops,DNSAUDIT_SSH_PASSWORD
+app1,10.0.2.10,host,linux,netops,DNSAUDIT_SSH_PASSWORD
+db1,10.0.2.20,host,linux,netops,DNSAUDIT_SSH_PASSWORD
+ws1,dhcp,host,linux,netops,DNSAUDIT_SSH_PASSWORD
+ws2,dhcp,host,linux,netops,DNSAUDIT_SSH_PASSWORD
+switch1,,skip,ovs,,

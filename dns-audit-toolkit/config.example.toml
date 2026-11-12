@@ -1,0 +1,35 @@
+# Copy to config.toml and adjust for your network.
+# Secrets never go in this file: passwords and tokens are read from environment variables.
+
+[dns]
+trusted_servers = ["10.0.0.53", "10.0.1.53"]   # your internal resolvers
+stub_resolvers  = ["127.0.0.53"]               # local stubs that need a deeper look
+
+[dns_service]
+hosts = ["dns1", "dns2"]                       # inventory names of the DNS servers
+service_candidates = ["named", "bind9", "unbound"]
+
+[dhcp]
+provider = "vyos"                              # "vyos" or "none"
+router   = "router1"                           # inventory name of the DHCP server
+
+[ssh]
+timeout = 10
+
+[smtp]
+host       = "smtp.example.internal"
+port       = 25
+starttls   = false
+sender     = "dns-audit@example.internal"
+recipients = ["noc@example.internal"]
+# username     = "dns-audit"
+# password_env = "DNSAUDIT_SMTP_PASSWORD"
+
+[tickets]
+url         = "https://helpdesk.example.internal/api/tickets"
+token_env   = "DNSAUDIT_TICKET_TOKEN"
+priority    = "high"
+assigned_to = "network-team"
+
+[output]
+dir = "results"

@@ -1,0 +1,11 @@
+Subject: URGENT: DNS compromise detected on $count device(s)
+
+Hello,
+
+This is an automated alert from dns-audit-toolkit. The following device(s) are not using the trusted DNS servers and should be treated as compromised:
+
+$device_list
+
+Immediate investigation and remediation are recommended.
+
+Network Monitoring

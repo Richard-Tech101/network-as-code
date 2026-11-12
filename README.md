@@ -1,288 +1,124 @@
-# 🌐 Python Network Emulator Suite
-### Built by Richard | Aspiring Network Automation & AI Agentic Specialist
+# Network as Code: Learning Lab
 
-[![Python](https://img.shields.io/badge/Python-3.14-blue)](https://python.org)
+### Richard Gan | Network Engineer moving into Network Automation
+
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-Richard--Tech101-black)](https://github.com/Richard-Tech101)
 
----
+This repository is my working journal for treating the network as code: first rebuilding how network devices
+behave in Python, then automating real operational work across many devices.
+It is updated as I learn. Projects start small and get refined over time.
 
-## 📌 Overview
-
-# This is constantly updated and revised - Any credit will be provided to the source if applicable. This serves as a learning journal for educational purposes only.
-A Python-based network protocol emulation suite built from first principles — implementing Layer 1 through Layer 3 forwarding logic in code. Each module replicates the core behavior of real enterprise network devices (Cisco, Arista) demonstrating deep understanding of switching, routing and ARP fundamentals that underpin modern network automation.
-
-This project bridges the gap between network engineering and software development — proving that understanding how networks work at the code level is the foundation of building autonomous, agentic network systems.
-
----
-
-## 🎯 Why This Project Exists
-
-Most network engineers understand *what* a MAC table does.  
-Few can explain *how* it works in code.
-
-This suite encodes core networking intelligence into Python — the same logic used in:
-- GNS3 / EVE-NG virtual network emulators
-- Cisco and Arista network operating systems
-- SDN controller forwarding decisions
-- AI agent tool libraries for agentic network operations
+| # | Project | Theme | Status |
+|---|---|---|---|
+| 1 | [Protocol emulators](#1-protocol-emulators) | How hubs, switches, ARP and routers make decisions, written from first principles | Learning scripts |
+| 2 | [dns-audit-toolkit](dns-audit-toolkit/) | Automated incident response: find, report and fix hosts using a rogue DNS server | Working tool + unit tests |
 
 ---
 
-## 📁 Project Structure
+## 1. Protocol emulators
 
-```
-network-emulators/
-│
-├── ethernet_hub.py          # Layer 1/2 — Hub with port flooding
-├── arp_cache.py             # Layer 2/3 — ARP cache simulation
-├── ethernet_switch.py       # Layer 2 — MAC learning and forwarding
-├── interface_counters.py    # Telemetry — In/out frames and bytes
-├── routing_table.py         # Layer 3 — RIB/FIB with OOP Router class
-├── ipv4_forwarding.py       # Layer 3 — IPv4 longest prefix match
-├── router_benchmark.py      # Performance — Forwarding benchmarking
-└── README.md
-```
+Small, single-file Python programs that mimic the forwarding logic of real devices and print
+output styled after Cisco / Arista CLI commands. The goal is to understand *how* a device decides,
+not just *what* a `show` command displays.
 
----
+| File | Layer | What it does | CLI it imitates |
+|---|---|---|---|
+| `ethernet_hub.py` | L1 | Interactive hub: a signal on one port is repeated out of every other port | - |
+| `arp_cache.py` | L2/L3 | Looks up an IP in an ARP cache; a miss is added as `Incomplete` | `show ip arp` |
+| `ethernet_switch.py` | L2 | MAC learning, known-unicast forwarding, unknown-unicast and broadcast flooding | `show mac address-table` |
+| `ethernet_switch_w_Interface_data.py` | L2 | The switch plus per-port in/out frame and byte counters | `show interfaces` |
+| `router.py` | L3 | `Router` class: routes are added to a RIB, and the FIB is built as `ipaddress` objects | `show ip route` |
 
-## 🔧 Modules
-
-### 1. `ethernet_hub.py` — Layer 1/2 Hub Emulator
-Simulates a network hub with port flooding behavior.
-
-**Concepts demonstrated:**
-- Ingress port identification
-- Broadcast flooding to all ports except ingress
-- Why hubs were replaced by switches (security/efficiency)
-
-**Real world equivalent:** Physical hub — all devices see all traffic
-
-```python
-# Example usage
-incoming_signal("Ethernet0/1", frame_data)
-# Floods to Ethernet0/2, 0/3, 0/4 automatically
-```
-
----
-
-### 2. `arp_cache.py` — ARP Cache Simulation
-Replicates Address Resolution Protocol cache lookup and storage.
-
-**Concepts demonstrated:**
-- IP to MAC address mapping
-- Cache hit vs cache miss behavior
-- Incomplete entry handling
-- Cisco `show ip arp` output format
-
-**Real world equivalent:** `show ip arp` on Cisco/Arista
-
-```python
-# Example usage
-lookup_arp("172.16.0.1")
-# Returns: 00:11:22:23:44:55
-```
-
----
-
-### 3. `ethernet_switch.py` — Layer 2 Switch with MAC Learning
-Full Layer 2 switch emulation with dynamic MAC address learning.
-
-**Concepts demonstrated:**
-- MAC address table population
-- Unicast forwarding vs unknown unicast flooding
-- Broadcast handling (FF:FF:FF:FF:FF:FF)
-- MAC move detection
-- Cisco `show mac address-table` output format
-
-**Real world equivalent:** Cisco Catalyst / Arista EOS switching ASIC
-
-```python
-# Example usage
-incoming_frame("00:11:22:33:44:55", "DE:AD:BE:EF:00:01", "Ethernet0/1", 64)
-# Learns source MAC, forwards or floods based on destination
-```
-
----
-
-### 4. `interface_counters.py` — Interface Telemetry
-Tracks per-interface packet and byte counters for ingress and egress traffic.
-
-**Concepts demonstrated:**
-- Stateful counter tracking
-- Ingress vs egress separation
-- Cisco `show interfaces` output format
-- Foundation of network telemetry and monitoring
-
-**Real world equivalent:** `show interfaces` counters on any network device
-
----
-
-### 5. `routing_table.py` — Router with RIB and FIB (OOP)
-Object-oriented Router class implementing Routing Information Base and Forwarding Information Base.
-
-**Concepts demonstrated:**
-- RIB vs FIB separation (exactly as real routers implement)
-- IPv4Network and IPv4Address using Python ipaddress module
-- Longest prefix match forwarding algorithm
-- Route types (Static, OSPF, BGP, Connected)
-- Arista EOS `show ip route` output format
-
-**Real world equivalent:** Control plane (RIB) and data plane (FIB) on Cisco/Arista
-
-```python
-# Example usage
-router = Router("core-01")
-router.add_route("10.5.16.0", 23, "192.0.2.1", "O")
-router.forward_packet("10.5.16.50")
-# Longest prefix match → via 192.0.2.1
-```
-
----
-
-### 6. `ipv4_forwarding.py` — IPv4 Packet Forwarding *(coming soon)*
-Pure IPv4 forwarding logic with longest prefix match at packet level.
-
----
-
-### 7. `router_benchmark.py` — Router Performance Benchmarking *(coming soon)*
-Measures packets per second forwarding performance of the emulated router.
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
 ```bash
-Python 3.10+
-```
-
-### Installation
-```bash
-git clone https://github.com/Richard-Tech101/network-emulators.git
-cd network-emulators
-```
-
-### Run Any Module
-```bash
-python ethernet_hub.py
-python arp_cache.py
+python ethernet_hub.py        # interactive: enter a port number
+python arp_cache.py           # interactive: enter an IP to look up
 python ethernet_switch.py
-python interface_counters.py
-python routing_table.py
+python ethernet_switch_w_Interface_data.py
+python router.py
 ```
 
----
-
-## 📊 OSI Layer Coverage
-
-| Module | OSI Layer | Concept |
-|--------|-----------|---------|
-| `ethernet_hub.py` | L1 / L2 | Physical flooding |
-| `arp_cache.py` | L2 / L3 | Address resolution |
-| `ethernet_switch.py` | L2 | MAC learning |
-| `interface_counters.py` | L1 / L2 | Telemetry |
-| `routing_table.py` | L3 | IP forwarding |
-| `ipv4_forwarding.py` | L3 | Packet forwarding |
-| `router_benchmark.py` | L3 | Performance |
+Concepts practiced: flooding vs forwarding, MAC table learning, ARP cache hits and misses,
+interface telemetry counters, RIB vs FIB, and Python's `ipaddress` module.
 
 ---
 
-## 🔗 Real World Validation
+## 2. dns-audit-toolkit
 
-Each module output mirrors real Cisco/Arista CLI commands:
+A config-driven command line tool that runs a full DNS incident response across a fleet of Linux hosts:
 
-| Module | Equivalent CLI Command |
-|--------|----------------------|
-| `arp_cache.py` | `show ip arp` |
-| `ethernet_switch.py` | `show mac address-table` |
-| `interface_counters.py` | `show interfaces` |
-| `routing_table.py` | `show ip route` |
+- **audit:** resolve each host's current IP (DHCP clients from the router's live lease table), ping it, SSH in and
+  work out the DNS servers it really uses (following the `127.0.0.53` stub resolver to its upstream servers)
+- **alert / tickets:** email the affected hosts and open one helpdesk ticket per host over a REST API
+- **service:** check and restart BIND / unbound on the DNS servers
+- **remediate:** back up the rogue config and restore the trusted servers (dry run by default), then re-verify
+- **resolved:** send the "all clear" email listing every fixed host
+
+Built with Paramiko, Netmiko, Requests, smtplib and systemd tooling, and covered by unit tests.
+Full details: **[dns-audit-toolkit/README.md](dns-audit-toolkit/README.md)**
 
 ---
 
-## 🧠 Learning Path Context
+## Skills on display
 
-This project is part of a broader network automation journey:
+| Area | Where |
+|---|---|
+| Networking fundamentals (L1-L3) | Protocol emulators |
+| Python (OOP, CLI tools, packaging, unit tests) | Both projects |
+| SSH automation (Paramiko, Netmiko, VyOS) | dns-audit-toolkit |
+| Linux operations (systemd, resolv.conf, systemd-resolved, BIND) | dns-audit-toolkit |
+| APIs and integrations (REST + bearer tokens, SMTP) | dns-audit-toolkit |
+| Safe automation practice (dry runs, backups, verify after change, secrets in env vars) | dns-audit-toolkit |
+
+---
+
+## Learning path and roadmap
 
 ```
-Network Emulator (this repo)
-        ↓
-Device Automation (Netmiko + Ansible)
-        ↓
-Container Platform (Docker + Kubernetes)
-        ↓
-CI/CD Pipeline (Jenkins + GitHub)
-        ↓
-AI Agent Layer (LangChain + Python)
-        ↓
-Agentic Network Operations (Syntrevo NetAgent)
+Protocol emulators (L1-L3 logic in code)          <- done
+        |
+Device automation (Netmiko / Paramiko)            <- dns-audit-toolkit
+        |
+Config management (Ansible, templated configs)    <- next
+        |
+Containers and CI/CD (Docker, GitHub Actions)
+        |
+AI agent tooling for network operations
 ```
 
----
-
-## 📜 Credits & Inspiration
-
-This project was built as part of my network automation learning journey.
-
-**Primary inspiration and learning source:**
-- [ ] Source 1: `[Author/Course Name] — [URL or platform]`
-- [ ] Source 2: `[Author/Course Name] — [URL or platform]`
-- [ ] Source 3: `[Book/Resource Name] — [Author]`
-
-**Technical references:**
-- [ ] Cisco IOS documentation — [cisco.com/c/en/us/support](https://cisco.com/c/en/us/support)
-- [ ] Arista EOS documentation — [arista.com/en/support](https://arista.com/en/support)
-- [ ] Python ipaddress module — [docs.python.org/3/library/ipaddress.html](https://docs.python.org/3/library/ipaddress.html)
-- [ ] RFC 791 — IPv4 — [tools.ietf.org/html/rfc791](https://tools.ietf.org/html/rfc791)
-- [ ] RFC 826 — ARP — [tools.ietf.org/html/rfc826](https://tools.ietf.org/html/rfc826)
-- [ ] RFC 4271 — BGP — [tools.ietf.org/html/rfc4271](https://tools.ietf.org/html/rfc4271)
-
-**All code was written and modified independently as part of my personal learning and professional development.**
+- [x] Hub, ARP cache, switch with MAC learning, interface counters
+- [x] Router RIB / FIB with `ipaddress`
+- [x] Multi-device DNS audit and remediation over SSH
+- [ ] Longest-prefix-match packet forwarding in `router.py`
+- [ ] Router forwarding benchmark (packets per second)
+- [ ] Turn the emulators into importable modules with tests
+- [ ] Templated multi-device config provisioning (Arista)
+- [ ] GitHub Actions running the unit tests on every push
+- [ ] Docker image for the toolkit
 
 ---
 
-## 👤 About
+## References
 
-**Richard**  
- 
+- Python `ipaddress` module: https://docs.python.org/3/library/ipaddress.html
+- RFC 826, ARP: https://www.rfc-editor.org/rfc/rfc826
+- RFC 791, IPv4: https://www.rfc-editor.org/rfc/rfc791
+- `resolv.conf(5)` and `systemd-resolved(8)` man pages
+- Paramiko: https://www.paramiko.org and Netmiko: https://github.com/ktbyers/netmiko
 
-- 🏢 Disney NOC — Arista/Cisco enterprise production
-- 🎓 CCNA | Linux LPI | CompTIA A+
-- 🔄 CCNP Enterprise | DevNet Professional (in progress)
-- ☁️ AWS Cloud Practitioner (in progress)
-- 🐍 Python network automation
-- 🤖 Building agentic network operations platform
-
-**Connect:**
-- [ ] LinkedIn: `[your LinkedIn URL]`
-- [ ] GitHub: [github.com/Richard-Tech101](https://github.com/Richard-Tech101)
-- [ ] Company: 
+All code in this repository was written by me as part of my own learning.
 
 ---
 
-## 📄 License
+## About
 
-MIT License — feel free to use, modify and distribute with attribution.
+**Richard Gan**: network operations on enterprise Arista / Cisco production networks, now building automation.
 
----
+- CCNA | Linux LPI | CompTIA A+
+- In progress: CCNP Enterprise, Cisco DevNet Professional, AWS Cloud Practitioner
+- GitHub: [github.com/Richard-Tech101](https://github.com/Richard-Tech101)
 
-## 🗺️ Roadmap
+## License
 
-- [x] ethernet_hub.py
-- [x] arp_cache.py  
-- [x] ethernet_switch.py
-- [x] interface_counters.py
-- [x] routing_table.py
-- [ ] ipv4_forwarding.py
-- [ ] router_benchmark.py
-- [ ] Netmiko integration — connect emulator to real devices
-- [ ] Docker containerization
-- [ ] LangChain agent tools — emulator as AI agent library
-- [ ] Syntrevo NetAgent v1 integration
-- [ ] Multi provisioning of  Arista configurations pushed by python
-
----
-
-*Built with purpose — understanding networks at the code level is the foundation of building networks that run themselves.*
-
+MIT, see [LICENSE](LICENSE).
